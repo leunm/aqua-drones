@@ -268,13 +268,14 @@ class WaterProjectile {
         ctx.restore();
     }
 
-    isOffscreen() {
-        return this.y < -this.radius || this.x < -this.radius || this.x > 800 + this.radius;
+    isOffscreen(canvasWidth = 800) {
+        return this.y < -this.radius || this.x < -this.radius || this.x > canvasWidth + this.radius;
     }
 }
 
 class Drone {
     constructor(canvasWidth, type = 'standard') {
+        this.canvasWidth = canvasWidth;
         this.type = type; // 'standard', 'fast', 'armored'
         
         const pastelColors = [
@@ -324,7 +325,7 @@ class Drone {
             this.x = this.startX + Math.sin(this.swerveTimer) * this.swerveAmplitude;
             // Keep inside screen bounds
             if (this.x < this.radius + 10) this.x = this.radius + 10;
-            if (this.x > 800 - this.radius - 10) this.x = 800 - this.radius - 10;
+            if (this.x > this.canvasWidth - this.radius - 10) this.x = this.canvasWidth - this.radius - 10;
         }
 
         this.wingTimer += dt * (this.type === 'fast' ? 24 : 15);

@@ -6,7 +6,7 @@ class Game {
         this.ctx = this.canvas.getContext('2d');
         
         // Logical resolution
-        this.width = 800;
+        this.width = 540;
         this.height = 720;
         
         // State variables
@@ -115,42 +115,42 @@ class Game {
         this.scenery = {
             mountainsDist: [
                 { x: 0, y: 520 },
-                { x: 120, y: 380 },
-                { x: 260, y: 480 },
-                { x: 420, y: 320 },
-                { x: 580, y: 450 },
-                { x: 700, y: 360 },
-                { x: 800, y: 520 }
+                { x: this.width * 0.15, y: 380 },
+                { x: this.width * 0.32, y: 480 },
+                { x: this.width * 0.52, y: 320 },
+                { x: this.width * 0.72, y: 450 },
+                { x: this.width * 0.88, y: 360 },
+                { x: this.width, y: 520 }
             ],
             mountainsClose: [
                 { x: 0, y: 560 },
-                { x: 180, y: 440 },
-                { x: 360, y: 530 },
-                { x: 520, y: 410 },
-                { x: 680, y: 500 },
-                { x: 800, y: 560 }
+                { x: this.width * 0.22, y: 440 },
+                { x: this.width * 0.45, y: 530 },
+                { x: this.width * 0.65, y: 410 },
+                { x: this.width * 0.85, y: 500 },
+                { x: this.width, y: 560 }
             ],
             flowers: [],
             clouds: [],
             planets: [
-                { type: 'saturn', x: 180, y: 140, r: 20, color: '#fde047', ringColor: '#fbbf24' },
-                { type: 'giant', x: 620, y: 90, r: 26, color: '#f472b6', stripeColor: '#fbcfe8' }
+                { type: 'saturn', x: this.width * 0.22, y: 140, r: 20, color: '#fde047', ringColor: '#fbbf24' },
+                { type: 'giant', x: this.width * 0.78, y: 90, r: 26, color: '#f472b6', stripeColor: '#fbcfe8' }
             ],
             menuFish: [],
             seaweed: [
-                { x: 45, h: 90, color: '#059669' },
-                { x: 90, h: 110, color: '#047857' },
-                { x: 140, h: 80, color: '#065f46' },
-                { x: 660, h: 70, color: '#065f46' },
-                { x: 710, h: 100, color: '#047857' },
-                { x: 755, h: 85, color: '#059669' }
+                { x: this.width * 0.06, h: 90, color: '#059669' },
+                { x: this.width * 0.11, h: 110, color: '#047857' },
+                { x: this.width * 0.18, h: 80, color: '#065f46' },
+                { x: this.width * 0.82, h: 70, color: '#065f46' },
+                { x: this.width * 0.89, h: 100, color: '#047857' },
+                { x: this.width * 0.94, h: 85, color: '#059669' }
             ]
         };
 
         // Pre-generate clouds drifting in sky
         for (let i = 0; i < 5; i++) {
             this.scenery.clouds.push({
-                x: Math.random() * 800,
+                x: Math.random() * this.width,
                 y: 60 + Math.random() * 120,
                 scale: 0.6 + Math.random() * 0.7,
                 speed: 10 + Math.random() * 15
@@ -637,7 +637,7 @@ class Game {
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
             p.update(dt);
-            if (p.isOffscreen()) {
+            if (p.isOffscreen(this.width)) {
                 this.projectiles.splice(i, 1);
             }
         }
@@ -1280,12 +1280,12 @@ class Game {
         shineY.forEach((y, idx) => {
             const waveOffset = Math.sin(this.gameTimer * 2 + idx) * 30;
             this.ctx.beginPath();
-            this.ctx.moveTo(60 + waveOffset, y);
-            this.ctx.lineTo(240 + waveOffset, y);
-            this.ctx.moveTo(350 - waveOffset, y + 5);
-            this.ctx.lineTo(550 - waveOffset, y + 5);
-            this.ctx.moveTo(600 + waveOffset, y - 5);
-            this.ctx.lineTo(760 + waveOffset, y - 5);
+            this.ctx.moveTo(this.width * 0.08 + waveOffset, y);
+            this.ctx.lineTo(this.width * 0.30 + waveOffset, y);
+            this.ctx.moveTo(this.width * 0.44 - waveOffset, y + 5);
+            this.ctx.lineTo(this.width * 0.69 - waveOffset, y + 5);
+            this.ctx.moveTo(this.width * 0.75 + waveOffset, y - 5);
+            this.ctx.lineTo(this.width * 0.95 + waveOffset, y - 5);
             this.ctx.stroke();
         });
 
@@ -1353,7 +1353,7 @@ class Game {
         this.ctx.fillStyle = hillColor1;
         this.ctx.beginPath();
         this.ctx.moveTo(0, 600);
-        this.ctx.quadraticCurveTo(280, 500, 800, 630);
+        this.ctx.quadraticCurveTo(this.width * 0.35, 500, this.width, 630);
         this.ctx.lineTo(this.width, this.height);
         this.ctx.lineTo(0, this.height);
         this.ctx.closePath();
@@ -1363,7 +1363,7 @@ class Game {
         this.ctx.fillStyle = hillColor2;
         this.ctx.beginPath();
         this.ctx.moveTo(0, 650);
-        this.ctx.quadraticCurveTo(540, 540, 800, 680);
+        this.ctx.quadraticCurveTo(this.width * 0.67, 540, this.width, 680);
         this.ctx.lineTo(this.width, this.height);
         this.ctx.lineTo(0, this.height);
         this.ctx.closePath();
@@ -1460,8 +1460,8 @@ class Game {
         ctx.fillStyle = '#eab308'; // Golden sand
         ctx.beginPath();
         ctx.moveTo(0, 680);
-        ctx.quadraticCurveTo(400, 660, 800, 680);
-        ctx.lineTo(800, 720);
+        ctx.quadraticCurveTo(this.width * 0.5, 660, this.width, 680);
+        ctx.lineTo(this.width, 720);
         ctx.lineTo(0, 720);
         ctx.closePath();
         ctx.fill();
@@ -1470,10 +1470,10 @@ class Game {
         ctx.strokeStyle = '#ca8a04';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(100, 690);
-        ctx.quadraticCurveTo(200, 685, 300, 690);
-        ctx.moveTo(500, 695);
-        ctx.quadraticCurveTo(600, 690, 700, 695);
+        ctx.moveTo(this.width * 0.12, 690);
+        ctx.quadraticCurveTo(this.width * 0.25, 685, this.width * 0.38, 690);
+        ctx.moveTo(this.width * 0.62, 695);
+        ctx.quadraticCurveTo(this.width * 0.75, 690, this.width * 0.88, 695);
         ctx.stroke();
 
         // 2. Coral bushes on the sides
@@ -1491,9 +1491,9 @@ class Game {
         ctx.fillStyle = '#34d399';
         ctx.shadowColor = '#34d399';
         ctx.beginPath();
-        ctx.arc(770, 690, 22, 0, Math.PI * 2);
-        ctx.arc(740, 700, 16, 0, Math.PI * 2);
-        ctx.arc(785, 710, 15, 0, Math.PI * 2);
+        ctx.arc(this.width - 30, 690, 22, 0, Math.PI * 2);
+        ctx.arc(this.width - 60, 700, 16, 0, Math.PI * 2);
+        ctx.arc(this.width - 15, 710, 15, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0; // Reset shadow
 
