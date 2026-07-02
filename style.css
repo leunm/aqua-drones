@@ -1,0 +1,437 @@
+/* CSS Design System for Aqua Drones */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+    --bg-dark: #070716;
+    --neon-blue: #00f0ff;
+    --neon-pink: #ff007f;
+    --neon-purple: #c026d3;
+    --glass-bg: rgba(13, 12, 33, 0.65);
+    --glass-border: rgba(0, 240, 255, 0.15);
+    --font-sans: 'Outfit', sans-serif;
+    --font-arcade: 'Orbitron', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+body {
+    background: radial-gradient(circle at center, #110e2e 0%, var(--bg-dark) 100%);
+    color: #f8fafc;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Main Layout Wrapper */
+.game-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Glass HUD Panel at top */
+.hud-panel {
+    width: 800px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 240, 255, 0.05);
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hud-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #94a3b8;
+    font-family: var(--font-arcade);
+}
+
+.hud-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    font-family: var(--font-arcade);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.hud-value.high-score {
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.hud-value.score {
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+/* Canvas Display */
+.canvas-container {
+    position: relative;
+    width: 800px;
+    height: 720px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                0 0 30px rgba(0, 240, 255, 0.15);
+    border: 2px solid rgba(0, 240, 255, 0.25);
+    background-color: #03030f;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* UI Overlay Screens (Absolute inside container) */
+.ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 4, 15, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center elements vertically now that they fit comfortably */
+    align-items: center;
+    padding: 30px 40px;
+    z-index: 10;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    overflow-y: auto; /* Fallback scrollbar if content overflows */
+}
+
+.ui-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Typography styles inside Overlays */
+h1 {
+    font-family: var(--font-arcade);
+    font-size: 48px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 30%, var(--neon-blue) 70%, var(--neon-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 12px rgba(0, 240, 255, 0.35));
+    animation: title-glow 3s infinite alternate;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px; /* Reduced from 40px */
+    font-family: var(--font-arcade);
+    text-align: center;
+}
+
+/* Glass cards for menus */
+.menu-card {
+    background: rgba(15, 15, 40, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 14px 24px; /* Reduced from 24px 32px */
+    width: 100%;
+    max-width: 440px;
+    margin-bottom: 15px; /* Reduced from 30px */
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.menu-card h2 {
+    font-family: var(--font-arcade);
+    font-size: 14px; /* Slightly smaller title text */
+    letter-spacing: 1.5px;
+    margin-bottom: 10px; /* Reduced from 16px */
+    color: var(--neon-blue);
+    text-transform: uppercase;
+}
+
+.guide-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.guide-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.key-badge {
+    background: #1e293b;
+    border: 1px solid #475569;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: var(--font-arcade);
+    font-size: 11px;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Neon buttons */
+.btn-neon {
+    font-family: var(--font-arcade);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    border: none;
+    padding: 16px 40px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3),
+                0 0 40px rgba(192, 38, 211, 0.15);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.btn-neon:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.5),
+                0 0 60px rgba(192, 38, 211, 0.3);
+}
+
+.btn-neon:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* Boss Warning Toast Alert */
+.boss-alert {
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(225, 29, 72, 0.85);
+    border: 2px solid var(--neon-pink);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 0 30px rgba(225, 29, 72, 0.4);
+    z-index: 8;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.boss-alert.active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: pulse-border 1.2s infinite alternate;
+}
+
+.boss-alert-icon {
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    animation: flash 0.6s infinite alternate;
+}
+
+.boss-alert-text {
+    font-family: var(--font-arcade);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+/* Stats display for game over */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+
+.stat-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-num {
+    font-family: var(--font-arcade);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--neon-pink);
+    margin-top: 4px;
+}
+
+/* Keyframe Animations */
+@keyframes title-glow {
+    0% {
+        filter: drop-shadow(0 4px 12px rgba(0, 240, 255, 0.25));
+    }
+    100% {
+        filter: drop-shadow(0 4px 22px rgba(192, 38, 211, 0.5));
+    }
+}
+
+@keyframes flash {
+    0% { opacity: 0.1; }
+    100% { opacity: 1; }
+}
+
+@keyframes pulse-border {
+    0% {
+        box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
+        border-color: rgba(225, 29, 72, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(225, 29, 72, 0.8);
+        border-color: var(--neon-pink);
+    }
+}
+
+/* Mini custom scrollbar (just in case) */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+
+/* Difficulty & Season Selector in menus */
+.difficulty-select, .season-select {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.diff-btn, .season-btn {
+    flex: 1;
+    font-family: var(--font-arcade);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 2px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.diff-btn:hover, .season-btn:hover {
+    color: #fff;
+    border-color: rgba(0, 240, 255, 0.4);
+    background: rgba(15, 23, 42, 0.7);
+}
+
+.diff-btn.active, .season-btn.active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(192, 38, 211, 0.25));
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+}
+
+/* Powerup Notification Toast */
+.powerup-toast {
+    position: absolute;
+    top: 90px;
+    right: 20px;
+    background: rgba(15, 12, 33, 0.85);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 10px 16px;
+    width: 200px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 8;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.powerup-toast.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.powerup-text {
+    font-family: var(--font-arcade);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    text-align: center;
+}
+
+.powerup-bar-bg {
+    width: 100%;
+    height: 4px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.powerup-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+    transition: width 0.1s linear;
+}
+
+/* Custom Overrides for Title and Pause Screens */
+#startScreen {
+    background: rgba(4, 4, 15, 0.4); /* High transparency so the animated menu scenery is visible */
+    backdrop-filter: blur(2px); /* Soft blur so menu items stand out, but you can still watch the fish swim */
+}
+
+#pauseScreen {
+    background: rgba(4, 4, 15, 0.65); /* More coverage to stand out from frozen game state */
+    backdrop-filter: blur(8px); /* Stronger blur so you can read menu options over the frozen game */
+}

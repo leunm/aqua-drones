@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aqua Drones: A high-octane 2D arcade survival game. Charge your water gun and defend against falling pastel drones and giant Kuromi bosses.">
+    <title>Aqua Drones - Arcade Water Survival</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- Live HUD Display -->
+        <div class="hud-panel">
+            <div class="hud-item">
+                <span class="hud-label">High Score</span>
+                <span id="highScoreVal" class="hud-value high-score">00000</span>
+            </div>
+            <div class="hud-item" style="align-items: center;">
+                <span class="hud-label">Lives</span>
+                <span id="livesVal" class="hud-value lives" style="color: var(--neon-pink); text-shadow: 0 0 10px rgba(255, 0, 127, 0.45);">❤️❤️❤️</span>
+            </div>
+            <div class="hud-item" style="align-items: center;">
+                <span class="hud-label">Score</span>
+                <span id="scoreVal" class="hud-value score">00000</span>
+            </div>
+            <div class="hud-item" style="align-items: flex-end;">
+                <span class="hud-label">Time Survived</span>
+                <span id="timeVal" class="hud-value">0.0s</span>
+            </div>
+        </div>
+
+        <!-- Main Canvas Frame -->
+        <div class="canvas-container">
+            <!-- Boss Warning Alert toast -->
+            <div id="bossAlert" class="boss-alert">
+                <div class="boss-alert-icon"></div>
+                <span class="boss-alert-text">Warning: Boss Enemy Detected!</span>
+            </div>
+
+            <!-- Active Powerup Toast -->
+            <div id="powerupToast" class="powerup-toast hidden">
+                <span id="powerupLabel" class="powerup-text">RAPID STREAM: 7.0s</span>
+                <div class="powerup-bar-bg"><div id="powerupBarFill" class="powerup-bar-fill"></div></div>
+            </div>
+
+            <!-- Start Screen Overlay -->
+            <div id="startScreen" class="ui-overlay">
+                <h1>Aqua Drones</h1>
+                <div class="subtitle">Arcade Water Survival</div>
+
+                <div class="menu-card">
+                    <h2>Combat Difficulty</h2>
+                    <div class="difficulty-select">
+                        <button class="diff-btn active" data-diff="easy">Easy (3 ❤️)</button>
+                        <button class="diff-btn" data-diff="medium">Medium (2 ❤️)</button>
+                        <button class="diff-btn" data-diff="hard">Hard (1 ❤️)</button>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <h2>Select Season</h2>
+                    <div class="season-select">
+                        <button class="season-btn active" data-season="autumn">🍁 Autumn</button>
+                        <button class="season-btn" data-season="winter">❄️ Winter</button>
+                        <button class="season-btn" data-season="spring">🌸 Spring</button>
+                        <button class="season-btn" data-season="summer">☀️ Summer</button>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <h2>Controls & Objectives</h2>
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 8px; font-family: var(--font-arcade); letter-spacing: 1px;">Controls</h3>
+                            <ul class="guide-list" style="gap: 6px; font-size: 11px;">
+                                <li>
+                                    <span>Move</span>
+                                    <div>
+                                        <span class="key-badge" style="padding: 2px 4px; font-size: 10px;">A</span>
+                                        <span class="key-badge" style="padding: 2px 4px; font-size: 10px;">D</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Shoot / Charge</span>
+                                    <div>
+                                        <span class="key-badge" style="padding: 2px 4px; font-size: 10px;">Space</span>
+                                        <span style="font-size: 11px; color: #94a3b8;">or</span>
+                                        <span class="key-badge" style="padding: 2px 4px; font-size: 10px;">J</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Fire Blast</span>
+                                    <span style="font-size: 10px; color: #94a3b8;">Release Key</span>
+                                </li>
+                                <li>
+                                    <span>Pause Game</span>
+                                    <span class="key-badge" style="padding: 2px 4px; font-size: 10px;">Esc</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="flex: 1.2; border-left: 1px solid rgba(255, 255, 255, 0.08); padding-left: 14px;">
+                            <h3 style="font-size: 10px; text-transform: uppercase; color: #64748b; margin-bottom: 8px; font-family: var(--font-arcade); letter-spacing: 1px;">Rules</h3>
+                            <ul class="guide-list" style="gap: 4px; font-size: 10.5px; list-style: none; padding: 0;">
+                                <li>🚀 Std/Fast/Swerve: 1 hit</li>
+                                <li>🛡️ Armored Drones: 3 hits</li>
+                                <li>👿 Bosses cycle: multi-hit</li>
+                                <li>💧 Scale charge for dmg</li>
+                                <li>⚠️ Breaches deduct 1 Heart</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="startBtn" class="btn-neon">Start Defending</button>
+            </div>
+
+            <!-- Pause Screen Overlay -->
+            <div id="pauseScreen" class="ui-overlay hidden">
+                <h1 style="color: var(--neon-blue); background: linear-gradient(135deg, #fff, var(--neon-blue)); -webkit-background-clip: text;">Paused</h1>
+                <div class="subtitle">Defense Operation Suspended</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 240px; margin-top: 10px;">
+                    <button id="resumeBtn" class="btn-neon" style="padding: 12px 30px; font-size: 13px;">Resume Defense</button>
+                    <button id="quitBtn" class="btn-neon" style="padding: 12px 30px; font-size: 13px; background: linear-gradient(135deg, #475569, #1e293b); box-shadow: 0 0 15px rgba(71, 85, 105, 0.2);">Quit to Title</button>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div id="gameOverScreen" class="ui-overlay hidden">
+                <h1 style="color: var(--neon-pink); background: linear-gradient(135deg, #fff, var(--neon-pink)); -webkit-background-clip: text;">Game Over</h1>
+                <div class="subtitle">Your perimeter was breached!</div>
+
+                <div class="menu-card">
+                    <h2>Defense Report</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="hud-label">Final Score</div>
+                            <div id="endScore" class="stat-num" style="color: #38bdf8;">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Time Survived</div>
+                            <div id="endTime" class="stat-num" style="color: #a855f7;">0s</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Drones Splashed</div>
+                            <div id="endDrones" class="stat-num" style="color: #22c55e;">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="hud-label">Bosses Cleared</div>
+                            <div id="endBosses" class="stat-num" style="color: var(--neon-pink);">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="restartBtn" class="btn-neon">Redeploy Cannon</button>
+            </div>
+
+            <!-- The HTML5 Canvas -->
+            <canvas id="gameCanvas" width="800" height="720"></canvas>
+        </div>
+    </div>
+
+    <!-- Script references -->
+    <script src="audio.js"></script>
+    <script src="entities.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
