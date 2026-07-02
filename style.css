@@ -123,7 +123,7 @@ canvas {
     flex-direction: column;
     justify-content: center; /* Center elements vertically now that they fit comfortably */
     align-items: center;
-    padding: 30px 40px;
+    padding: 30px 15px;
     z-index: 10;
     transition: opacity 0.3s ease, visibility 0.3s ease;
     overflow-y: auto; /* Fallback scrollbar if content overflows */
@@ -166,7 +166,7 @@ h1 {
     background: rgba(15, 15, 40, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 14px 24px; /* Reduced from 24px 32px */
+    padding: 12px 14px; /* Reduced to widen interior content space */
     width: 100%;
     max-width: 440px;
     margin-bottom: 15px; /* Reduced from 30px */
@@ -587,7 +587,7 @@ h1 {
     }
 
     .menu-card {
-        padding: 10px 16px !important;
+        padding: 10px 12px !important;
         margin-bottom: 10px !important;
     }
 
