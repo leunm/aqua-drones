@@ -6,7 +6,7 @@ class Game {
         this.ctx = this.canvas.getContext('2d');
         
         // Logical resolution
-        this.width = 540;
+        this.width = 432;
         this.height = 720;
         
         // State variables
