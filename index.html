@@ -157,6 +157,22 @@
 
             <!-- The HTML5 Canvas -->
             <canvas id="gameCanvas" width="800" height="720"></canvas>
+
+            <!-- Mobile Virtual Touch controls overlay -->
+            <div class="mobile-controls">
+                <div class="movement-group">
+                    <button id="touchLeft" class="touch-btn">◀</button>
+                    <button id="touchRight" class="touch-btn">▶</button>
+                </div>
+                <button id="touchShoot" class="touch-btn shoot">FIRE</button>
+            </div>
+        </div>
+
+        <!-- Portrait Lock Orientation Overlay -->
+        <div id="portraitOverlay" class="portrait-lock-overlay">
+            <div class="lock-icon">📱</div>
+            <h2>Portrait Mode Only</h2>
+            <p>Please rotate your phone to portrait (vertical) orientation to play!</p>
         </div>
     </div>
 

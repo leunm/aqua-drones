@@ -84,7 +84,8 @@ class Game {
             endBosses: document.getElementById('endBosses'),
             pauseScreen: document.getElementById('pauseScreen'),
             resumeBtn: document.getElementById('resumeBtn'),
-            quitBtn: document.getElementById('quitBtn')
+            quitBtn: document.getElementById('quitBtn'),
+            container: document.querySelector('.canvas-container')
         };
 
         // Delta time tracking
@@ -245,6 +246,65 @@ class Game {
                 this.selectedSeason = btn.dataset.season;
             });
         });
+
+        // Mobile Virtual Controls touch and mouse click bindings
+        const touchLeft = document.getElementById('touchLeft');
+        const touchRight = document.getElementById('touchRight');
+        const touchShoot = document.getElementById('touchShoot');
+
+        if (touchLeft && touchRight && touchShoot) {
+            // Helper functions for Left button
+            const moveLeftStart = (e) => {
+                e.preventDefault();
+                this.keys['ArrowLeft'] = true;
+            };
+            const moveLeftEnd = (e) => {
+                e.preventDefault();
+                this.keys['ArrowLeft'] = false;
+            };
+            touchLeft.addEventListener('touchstart', moveLeftStart);
+            touchLeft.addEventListener('touchend', moveLeftEnd);
+            touchLeft.addEventListener('mousedown', moveLeftStart);
+            touchLeft.addEventListener('mouseup', moveLeftEnd);
+            touchLeft.addEventListener('mouseleave', moveLeftEnd);
+
+            // Helper functions for Right button
+            const moveRightStart = (e) => {
+                e.preventDefault();
+                this.keys['ArrowRight'] = true;
+            };
+            const moveRightEnd = (e) => {
+                e.preventDefault();
+                this.keys['ArrowRight'] = false;
+            };
+            touchRight.addEventListener('touchstart', moveRightStart);
+            touchRight.addEventListener('touchend', moveRightEnd);
+            touchRight.addEventListener('mousedown', moveRightStart);
+            touchRight.addEventListener('mouseup', moveRightEnd);
+            touchRight.addEventListener('mouseleave', moveRightEnd);
+
+            // Helper functions for Shoot button
+            const shootStart = (e) => {
+                e.preventDefault();
+                this.keys['Space'] = true;
+                if (this.isPlaying && this.player && !this.player.isCharging) {
+                    this.player.isCharging = true;
+                    if (window.sounds) window.sounds.startCharge();
+                }
+            };
+            const shootEnd = (e) => {
+                e.preventDefault();
+                this.keys['Space'] = false;
+                if (this.isPlaying && this.player && this.player.isCharging) {
+                    this.fireProjectile();
+                }
+            };
+            touchShoot.addEventListener('touchstart', shootStart);
+            touchShoot.addEventListener('touchend', shootEnd);
+            touchShoot.addEventListener('mousedown', shootStart);
+            touchShoot.addEventListener('mouseup', shootEnd);
+            touchShoot.addEventListener('mouseleave', shootEnd);
+        }
     }
 
     updateHUD() {
@@ -312,6 +372,7 @@ class Game {
 
         this.isPaused = false;
         this.ui.pauseScreen.classList.add('hidden');
+        this.ui.container.classList.add('game-active'); // Enable virtual control visibility inside container
         this.updateHUD();
     }
 
@@ -439,6 +500,7 @@ class Game {
         this.ui.endBosses.textContent = this.bossesCleared;
         
         this.ui.gameOverScreen.classList.remove('hidden');
+        this.ui.container.classList.remove('game-active'); // Hide virtual controls on Game Over
         this.updateHUD();
     }
 
@@ -1553,6 +1615,7 @@ class Game {
         this.ui.gameOverScreen.classList.add('hidden');
         this.ui.bossAlert.classList.remove('active');
         this.ui.powerupToast.classList.add('hidden');
+        this.ui.container.classList.remove('game-active'); // Hide virtual controls on Title return
         this.activePowerup = null;
         this.powerupTimer = 0;
         this.updateHUD();
