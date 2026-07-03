@@ -237,6 +237,15 @@ h1 {
     transform: translateY(1px) scale(0.98);
 }
 
+.btn-neon.btn-red {
+    background: linear-gradient(135deg, #f43f5e, #be123c);
+    box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+}
+
+.btn-neon.btn-red:hover {
+    box-shadow: 0 0 30px rgba(244, 63, 94, 0.5);
+}
+
 /* Boss Warning Toast Alert */
 .boss-alert {
     position: absolute;
@@ -343,15 +352,15 @@ h1 {
     border-radius: 3px;
 }
 
-/* Difficulty & Season Selector in menus */
-.difficulty-select, .season-select {
+/* Difficulty, Lives & Season Selector in menus */
+.difficulty-select, .lives-select, .season-select {
     display: flex;
     gap: 10px;
     margin-top: 8px;
     width: 100%;
 }
 
-.diff-btn, .season-btn {
+.diff-btn, .lives-btn, .season-btn {
     flex: 1;
     font-family: var(--font-arcade);
     font-size: 10px;
@@ -366,13 +375,13 @@ h1 {
     transition: all 0.2s ease;
 }
 
-.diff-btn:hover, .season-btn:hover {
+.diff-btn:hover, .lives-btn:hover, .season-btn:hover {
     color: #fff;
     border-color: rgba(0, 240, 255, 0.4);
     background: rgba(15, 23, 42, 0.7);
 }
 
-.diff-btn.active, .season-btn.active {
+.diff-btn.active, .lives-btn.active, .season-btn.active {
     color: #fff;
     background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(192, 38, 211, 0.25));
     border-color: var(--neon-blue);
@@ -460,7 +469,7 @@ h1 {
 
 .movement-group {
     display: flex;
-    gap: 15px;
+    gap: 22px; /* Increased from 15px */
     pointer-events: auto;
 }
 
@@ -469,8 +478,8 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 68px;
-    height: 68px;
+    width: 72px; /* Increased from 68px */
+    height: 72px; /* Increased from 68px */
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.65);
     border: 1px solid rgba(0, 240, 255, 0.4);
@@ -561,9 +570,9 @@ h1 {
     }
 
     .touch-btn {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 18px !important;
+        width: 60px !important; /* Increased from 50px */
+        height: 60px !important; /* Increased from 50px */
+        font-size: 22px !important; /* Increased from 18px */
     }
 
     .touch-btn.shoot {
@@ -573,7 +582,7 @@ h1 {
     }
 
     .movement-group {
-        gap: 8px !important;
+        gap: 18px !important; /* Increased from 8px */
     }
 
     h1 {
@@ -613,9 +622,9 @@ h1 {
     }
 
     .touch-btn {
-        width: 42px !important;
-        height: 42px !important;
-        font-size: 15px !important;
+        width: 50px !important; /* Increased from 42px */
+        height: 50px !important; /* Increased from 42px */
+        font-size: 18px !important; /* Increased from 15px */
     }
 
     .touch-btn.shoot {
@@ -625,7 +634,7 @@ h1 {
     }
 
     .movement-group {
-        gap: 6px !important;
+        gap: 12px !important; /* Increased from 6px */
     }
 }
 

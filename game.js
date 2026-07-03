@@ -19,8 +19,8 @@ class Game {
         this.dronesSplashed = 0;
         this.bossesCleared = 0;
 
-        // Difficulty Modes
-        this.selectedDifficulty = 'easy'; // Default
+        // Starting Lives Setting
+        this.startingLivesSetting = 3; // Default starting lives
         this.maxLives = 3;
         this.currentLives = 3;
         this.selectedSeason = 'autumn'; // Default season (Autumn is default now)
@@ -85,6 +85,7 @@ class Game {
             pauseScreen: document.getElementById('pauseScreen'),
             resumeBtn: document.getElementById('resumeBtn'),
             quitBtn: document.getElementById('quitBtn'),
+            endQuitBtn: document.getElementById('endQuitBtn'),
             container: document.querySelector('.canvas-container')
         };
 
@@ -226,14 +227,17 @@ class Game {
         this.ui.restartBtn.addEventListener('click', () => this.startGame());
         this.ui.resumeBtn.addEventListener('click', () => this.togglePause());
         this.ui.quitBtn.addEventListener('click', () => this.quitToTitle());
+        if (this.ui.endQuitBtn) {
+            this.ui.endQuitBtn.addEventListener('click', () => this.quitToTitle());
+        }
 
-        // Segmented Difficulty Buttons
-        const diffBtns = document.querySelectorAll('.diff-btn');
-        diffBtns.forEach(btn => {
+        // Segmented Lives Selection Buttons
+        const livesBtns = document.querySelectorAll('.lives-btn');
+        livesBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                diffBtns.forEach(b => b.classList.remove('active'));
+                livesBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                this.selectedDifficulty = btn.dataset.diff;
+                this.startingLivesSetting = parseInt(btn.dataset.lives);
             });
         });
 
@@ -329,17 +333,9 @@ class Game {
         this.ui.bossAlert.classList.remove('active');
         this.ui.powerupToast.classList.add('hidden');
 
-        // Apply Difficulty selection
-        if (this.selectedDifficulty === 'medium') {
-            this.maxLives = 2;
-            this.currentLives = 2;
-        } else if (this.selectedDifficulty === 'hard') {
-            this.maxLives = 1;
-            this.currentLives = 1;
-        } else {
-            this.maxLives = 3;
-            this.currentLives = 3;
-        }
+        // Apply starting lives selection
+        this.maxLives = this.startingLivesSetting;
+        this.currentLives = this.startingLivesSetting;
 
         this.player = new WaterGun(this.width, this.height);
         this.projectiles = [];
