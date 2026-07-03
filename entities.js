@@ -146,7 +146,7 @@ class WaterGun {
 }
 
 class WaterProjectile {
-    constructor(x, y, chargeLevel, isRocket = false, vx = 0, vy = null) {
+    constructor(x, y, chargeLevel, isRocket = false, vx = 0, vy = null, isLaser = false) {
         this.x = x;
         this.y = y;
         
@@ -155,6 +155,8 @@ class WaterProjectile {
         this.damage = 1 + chargeLevel * 8; // 1 to 9 damage
         this.speed = 600 - chargeLevel * 150; 
         this.isRocket = isRocket;
+        this.isLaser = isLaser;
+        this.hitTargets = []; // Stores references of enemies/bosses already hit to support piercing
         
         // Speed up rocket bullets
         if (this.isRocket) {
@@ -182,7 +184,34 @@ class WaterProjectile {
     draw(ctx) {
         ctx.save();
         
-        if (this.isRocket) {
+        if (this.isLaser) {
+            // Draw neon laser trail
+            this.trail.forEach((pos, idx) => {
+                const opacity = idx / this.trail.length;
+                const size = pos.r * (0.4 + 0.6 * (idx / this.trail.length));
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 255, 204, ${opacity * 0.45})`; 
+                ctx.fill();
+            });
+
+            // Main laser bolt capsule
+            ctx.translate(this.x, this.y);
+            ctx.shadowBlur = 15 + this.charge * 20;
+            ctx.shadowColor = '#00ffcc';
+
+            const height = this.radius * 2.8;
+            const width = this.radius * 0.9;
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#00ffcc';
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.roundRect(-width / 2, -height / 2, width, height, width / 2);
+            ctx.fill();
+            ctx.stroke();
+
+        } else if (this.isRocket) {
             // Draw rocket tail fire trail
             this.trail.forEach((pos, idx) => {
                 const opacity = idx / this.trail.length;
@@ -1058,12 +1087,14 @@ class Powerup {
         this.y = -this.radius - 10;
         this.speed = 120;
         
-        // Distribution: 40% explosive rocket, 40% spread shotgun, 20% heart recovery (rapid fire removed)
+        // Distribution: 30% explosive rocket, 30% spread shotgun, 25% piercing laser, 15% heart recovery
         const rand = Math.random();
-        if (rand < 0.40) {
+        if (rand < 0.30) {
             this.type = 'rocket';
-        } else if (rand < 0.80) {
+        } else if (rand < 0.60) {
             this.type = 'spread';
+        } else if (rand < 0.85) {
+            this.type = 'laser';
         } else {
             this.type = 'heart';
         }
@@ -1097,6 +1128,10 @@ class Powerup {
             glowColor = '#10b981'; // emerald green
             innerColor = '#d1fae5';
             strokeColor = '#047857';
+        } else if (this.type === 'laser') {
+            glowColor = '#00ffcc'; // neon green/cyan
+            innerColor = '#e6fffa';
+            strokeColor = '#0d9488';
         } else if (this.type === 'heart') {
             glowColor = '#ff007f';
             innerColor = '#ffe4e6';
@@ -1169,6 +1204,29 @@ class Powerup {
             ctx.moveTo(0, 8); ctx.lineTo(-4.5, 1.5);
             ctx.moveTo(0, 8); ctx.lineTo(4.5, 1.5);
             ctx.stroke();
+        } else if (this.type === 'laser') {
+            // Draw piercing laser bolt icon (vertical line with two upward arrowheads)
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3.0;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.lineTo(0, 9);
+            ctx.stroke();
+
+            ctx.fillStyle = strokeColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.lineTo(-4, -5);
+            ctx.lineTo(4, -5);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(0, -3);
+            ctx.lineTo(-4, 1);
+            ctx.lineTo(4, 1);
+            ctx.closePath();
+            ctx.fill();
         } else if (this.type === 'heart') {
             // Draw Heart shape
             ctx.beginPath();

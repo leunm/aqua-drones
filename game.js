@@ -377,18 +377,19 @@ class Game {
         const muzzleY = this.player.y - 8;
         
         const isRocket = (this.activePowerup === 'rocket');
+        const isLaser = (this.activePowerup === 'laser');
         
         if (this.activePowerup === 'spread') {
             const speed = (600 - this.player.chargeLevel * 150) * (isRocket ? 1.35 : 1.0);
             const angle = 15 * Math.PI / 180; // 15 degrees spread
             
-            const projCenter = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, 0, -speed);
-            const projLeft = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, -speed * Math.sin(angle), -speed * Math.cos(angle));
-            const projRight = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, speed * Math.sin(angle), -speed * Math.cos(angle));
+            const projCenter = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, 0, -speed, false);
+            const projLeft = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, -speed * Math.sin(angle), -speed * Math.cos(angle), false);
+            const projRight = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, speed * Math.sin(angle), -speed * Math.cos(angle), false);
             
             this.projectiles.push(projCenter, projLeft, projRight);
         } else {
-            const proj = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket);
+            const proj = new WaterProjectile(muzzleX, muzzleY, this.player.chargeLevel, isRocket, 0, null, isLaser);
             this.projectiles.push(proj);
         }
 
@@ -398,7 +399,7 @@ class Game {
 
         const pCount = 5 + Math.round(this.player.chargeLevel * 10);
         for (let i = 0; i < pCount; i++) {
-            const p = new Particle(muzzleX, muzzleY, 'splash', isRocket ? '#f97316' : '#00f0ff');
+            const p = new Particle(muzzleX, muzzleY, 'splash', isRocket ? '#f97316' : (isLaser ? '#00ffcc' : '#00f0ff'));
             p.vy = -150 - Math.random() * 100;
             p.vx = (Math.random() - 0.5) * 120;
             this.particles.push(p);
@@ -602,6 +603,7 @@ class Game {
             let pLabel = 'ACTIVE POWERUP';
             if (this.activePowerup === 'rocket') pLabel = 'EXPLOSIVE ROCKETS';
             else if (this.activePowerup === 'spread') pLabel = 'SPREAD BLASTER';
+            else if (this.activePowerup === 'laser') pLabel = 'PIERCING LASER';
             
             this.ui.powerupLabel.textContent = `${pLabel}: ${this.powerupTimer.toFixed(1)}s`;
             
@@ -614,6 +616,10 @@ class Game {
                 this.ui.powerupLabel.style.color = '#10b981'; // emerald green
                 this.ui.powerupLabel.style.textShadow = '0 0 8px rgba(16, 185, 129, 0.4)';
                 this.ui.powerupBarFill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+            } else if (this.activePowerup === 'laser') {
+                this.ui.powerupLabel.style.color = '#00ffcc'; // neon green/cyan
+                this.ui.powerupLabel.style.textShadow = '0 0 8px rgba(0, 255, 204, 0.4)';
+                this.ui.powerupBarFill.style.background = 'linear-gradient(90deg, #00ffcc, #06b6d4)';
             } else {
                 this.ui.powerupLabel.style.color = 'var(--neon-blue)';
                 this.ui.powerupLabel.style.textShadow = '0 0 8px rgba(0, 240, 255, 0.4)';
@@ -772,7 +778,40 @@ class Game {
 
                 if (dist < minDist) {
                     // Collision!
-                    if (proj.isRocket) {
+                    if (proj.isLaser) {
+                        // Piercing laser check
+                        if (!proj.hitTargets.includes(drone)) {
+                            proj.hitTargets.push(drone);
+                            if (drone.type === 'armored') {
+                                drone.hp -= proj.damage;
+                                for (let s = 0; s < 6; s++) {
+                                    this.particles.push(new Particle(proj.x, proj.y, 'splash', '#00ffcc'));
+                                }
+                                if (drone.hp <= 0) {
+                                    this.score += Math.round(300 * this.difficultyMultiplier);
+                                    this.dronesSplashed++;
+                                    if (window.sounds) window.sounds.playExplode();
+                                    for (let e = 0; e < 15; e++) {
+                                        this.particles.push(new Particle(drone.x, drone.y, 'explosion', '#94a3b8'));
+                                    }
+                                    this.enemies.splice(dIdx, 1);
+                                } else {
+                                    if (window.sounds) window.sounds.playBossHit();
+                                }
+                            } else {
+                                this.score += Math.round((drone.type === 'fast' ? 200 : 100) * this.difficultyMultiplier);
+                                this.dronesSplashed++;
+                                if (window.sounds) window.sounds.playHit();
+                                for (let s = 0; s < 12; s++) {
+                                    this.particles.push(new Particle(drone.x, drone.y, 'splash', '#00ffcc'));
+                                }
+                                for (let e = 0; e < 8; e++) {
+                                    this.particles.push(new Particle(drone.x, drone.y, 'explosion', drone.style.accent));
+                                }
+                                this.enemies.splice(dIdx, 1);
+                            }
+                        }
+                    } else if (proj.isRocket) {
                         this.triggerExplosiveBlast(proj.x, proj.y, proj.damage);
                         this.projectiles.splice(pIdx, 1);
                     } else {
@@ -830,7 +869,42 @@ class Game {
                 const minDist = proj.radius + boss.radius;
 
                 if (dist < minDist) {
-                    if (proj.isRocket) {
+                    if (proj.isLaser) {
+                        // Piercing laser vs bosses check
+                        if (!proj.hitTargets.includes(boss)) {
+                            proj.hitTargets.push(boss);
+                            boss.currentHp -= proj.damage;
+                            this.triggerScreenShake(3 + proj.charge * 6, 0.15);
+                            if (window.sounds) window.sounds.playBossHit();
+
+                            const splashCount = 8 + Math.round(proj.charge * 12);
+                            for (let s = 0; s < splashCount; s++) {
+                                const p = new Particle(proj.x, proj.y, 'splash', '#00ffcc');
+                                p.vx = (Math.random() - 0.5) * 200 + (dx * 3);
+                                p.vy = (Math.random() - 0.5) * 200 + (dy * 3);
+                                this.particles.push(p);
+                            }
+
+                            if (boss.currentHp <= 0) {
+                                const bonusScore = 1500 + Math.round(boss.maxHp * 150);
+                                this.score += bonusScore;
+                                this.bossesCleared++;
+
+                                if (window.sounds) window.sounds.playExplode();
+                                this.triggerScreenShake(14, 0.45);
+
+                                let explosionColor = '#c026d3';
+                                if (boss.bossType === 'kitty') explosionColor = '#ef4444';
+                                else if (boss.bossType === 'melody') explosionColor = '#ec4899';
+                                else if (boss.bossType === 'purin') explosionColor = '#eab308';
+
+                                for (let s = 0; s < 30; s++) {
+                                    this.particles.push(new Particle(boss.x, boss.y, 'explosion', explosionColor));
+                                }
+                                this.bosses.splice(bIdx, 1);
+                            }
+                        }
+                    } else if (proj.isRocket) {
                         this.triggerExplosiveBlast(proj.x, proj.y, proj.damage);
                         this.projectiles.splice(pIdx, 1);
                     } else {
