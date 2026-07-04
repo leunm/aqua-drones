@@ -86,6 +86,7 @@ class Game {
             resumeBtn: document.getElementById('resumeBtn'),
             quitBtn: document.getElementById('quitBtn'),
             endQuitBtn: document.getElementById('endQuitBtn'),
+            mobilePauseBtn: document.getElementById('mobilePauseBtn'),
             container: document.querySelector('.canvas-container')
         };
 
@@ -229,6 +230,12 @@ class Game {
         this.ui.quitBtn.addEventListener('click', () => this.quitToTitle());
         if (this.ui.endQuitBtn) {
             this.ui.endQuitBtn.addEventListener('click', () => this.quitToTitle());
+        }
+        if (this.ui.mobilePauseBtn) {
+            this.ui.mobilePauseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.togglePause();
+            });
         }
 
         // Segmented Lives Selection Buttons

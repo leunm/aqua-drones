@@ -1083,7 +1083,8 @@ class Particle {
 class Powerup {
     constructor(canvasWidth) {
         this.radius = 18;
-        this.x = this.radius + Math.random() * (canvasWidth - this.radius * 2);
+        // Restrict spawn range to be within reach of the cannon's muzzle limits (50px to canvasWidth - 50px)
+        this.x = 50 + Math.random() * (canvasWidth - 100);
         this.y = -this.radius - 10;
         this.speed = 120;
         

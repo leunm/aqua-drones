@@ -124,7 +124,7 @@ canvas {
     justify-content: center; /* Center elements vertically now that they fit comfortably */
     align-items: center;
     padding: 30px 15px;
-    z-index: 10;
+    z-index: 100; /* Increased from 10 to cover virtual buttons and pause trigger during pause states */
     transition: opacity 0.3s ease, visibility 0.3s ease;
     overflow-y: auto; /* Fallback scrollbar if content overflows */
 }
@@ -643,4 +643,42 @@ h1 {
     .portrait-lock-overlay {
         display: flex;
     }
+}
+
+/* Floating Mobile Pause Button */
+.mobile-pause-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 95; /* Sits above standard play canvas elements, but below overlays (z-index 100) */
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    display: none; /* Only shown via game-active class */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 12px rgba(0, 240, 255, 0.15);
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+}
+
+.canvas-container.game-active .mobile-pause-btn {
+    display: flex;
+}
+
+.mobile-pause-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(0, 240, 255, 0.6);
+}
+
+.mobile-pause-btn:active {
+    transform: scale(0.92);
 }
