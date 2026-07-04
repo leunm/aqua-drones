@@ -5,6 +5,12 @@ class SoundManager {
         this.chargeGain = null;
         this.enabled = true;
         this.noiseBuffer = null;
+        
+        // Music state variables
+        this.musicIntervalId = null;
+        this.musicStep = 0;
+        this.currentSeasonMusic = null;
+        this.musicVolume = 0.04; // Gentle background music volume
     }
 
     init() {
@@ -302,6 +308,152 @@ class SoundManager {
             osc.start(now + index * 0.15);
             osc.stop(now + index * 0.15 + 0.4);
         });
+    }
+
+    playMusic(season) {
+        this.resume();
+        if (!this.ctx || !this.enabled) return;
+
+        // If we are already playing this season's music, don't restart it
+        if (this.currentSeasonMusic === season && this.musicIntervalId) return;
+
+        // Stop any current music first
+        this.stopMusic();
+
+        this.currentSeasonMusic = season;
+        this.musicStep = 0;
+
+        // Determine step duration based on season
+        let stepDuration = 250; // ms (120 BPM eighth notes)
+        if (season === 'summer') stepDuration = 200; // Faster retro beat
+        if (season === 'autumn') stepDuration = 300; // Slower nostalgic drift
+
+        // Define note tables for each season
+        let bassPattern = [];
+        let melodyPattern = [];
+
+        if (season === 'autumn') {
+            // Nostalgic Am - G - F - Em progression
+            bassPattern = [
+                110.00, 110.00, 110.00, 110.00,
+                98.00, 98.00, 98.00, 98.00,
+                87.31, 87.31, 87.31, 87.31,
+                82.41, 82.41, 82.41, 82.41
+            ];
+            melodyPattern = [
+                440.00, 523.25, 659.25, 0,
+                392.00, 493.88, 587.33, 0,
+                349.23, 440.00, 523.25, 0,
+                329.63, 392.00, 493.88, 587.33
+            ];
+        } else if (season === 'winter') {
+            // Sparkling Lydian C - F# - G - C progression
+            bassPattern = [
+                130.81, 130.81, 130.81, 130.81,
+                185.00, 185.00, 185.00, 185.00,
+                196.00, 196.00, 196.00, 196.00,
+                130.81, 130.81, 130.81, 130.81
+            ];
+            melodyPattern = [
+                523.25, 659.25, 987.77, 0,
+                739.99, 987.77, 1046.50, 0,
+                783.99, 987.77, 1174.66, 0,
+                523.25, 783.99, 987.77, 1318.51
+            ];
+        } else if (season === 'spring') {
+            // Bright Bouncy F - Bb - C - F progression
+            bassPattern = [
+                87.31, 87.31, 87.31, 87.31,
+                116.54, 116.54, 116.54, 116.54,
+                130.81, 130.81, 130.81, 130.81,
+                87.31, 87.31, 87.31, 87.31
+            ];
+            melodyPattern = [
+                349.23, 440.00, 523.25, 440.00,
+                466.16, 587.33, 698.46, 587.33,
+                523.25, 659.25, 783.99, 0,
+                349.23, 523.25, 698.46, 880.00
+            ];
+        } else {
+            // Summer: Retro-synthwave G - C - D - G progression
+            bassPattern = [
+                98.00, 98.00, 98.00, 98.00,
+                130.81, 130.81, 130.81, 130.81,
+                146.83, 146.83, 146.83, 146.83,
+                98.00, 98.00, 98.00, 98.00
+            ];
+            melodyPattern = [
+                392.00, 493.88, 587.33, 783.99,
+                523.25, 659.25, 783.99, 1046.50,
+                587.33, 739.99, 880.00, 1174.66,
+                783.99, 587.33, 493.88, 392.00
+            ];
+        }
+
+        // Start scheduling notes at intervals
+        this.musicIntervalId = setInterval(() => {
+            if (!this.ctx || this.ctx.state === 'suspended') return;
+            const now = this.ctx.currentTime;
+            
+            const step = this.musicStep % 16;
+            
+            // 1. Play Bass Note (Triangle osc, soft, decay)
+            const bassFreq = bassPattern[step];
+            if (bassFreq) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(bassFreq, now);
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(this.musicVolume * 0.7, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + (stepDuration / 1000) * 1.5);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + (stepDuration / 1000) * 1.6);
+            }
+            
+            // 2. Play Melody Note (Sine or Triangle, quick decay, bells for winter, retro for summer)
+            const melFreq = melodyPattern[step];
+            if (melFreq) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                if (season === 'winter') {
+                    osc.type = 'sine';
+                } else if (season === 'summer') {
+                    osc.type = 'triangle';
+                } else {
+                    osc.type = 'sine';
+                }
+                
+                osc.frequency.setValueAtTime(melFreq, now);
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(this.musicVolume * 0.5, now + 0.01);
+                
+                const decayFactor = (season === 'winter') ? 0.35 : 0.8;
+                gain.gain.exponentialRampToValueAtTime(0.001, now + (stepDuration / 1000) * decayFactor);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + (stepDuration / 1000) * (decayFactor + 0.1));
+            }
+
+            this.musicStep++;
+        }, stepDuration);
+    }
+
+    stopMusic() {
+        if (this.musicIntervalId) {
+            clearInterval(this.musicIntervalId);
+            this.musicIntervalId = null;
+        }
+        this.currentSeasonMusic = null;
     }
 }
 

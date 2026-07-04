@@ -326,6 +326,7 @@ class Game {
         if (window.sounds) {
             window.sounds.resume();
             window.sounds.playStart();
+            window.sounds.playMusic(this.selectedSeason);
         }
 
         this.ui.startScreen.classList.add('hidden');
@@ -483,6 +484,7 @@ class Game {
         
         if (window.sounds) {
             window.sounds.stopCharge();
+            window.sounds.stopMusic();
             window.sounds.playGameOver();
         }
 
@@ -1659,10 +1661,14 @@ class Game {
             }
             if (window.sounds) {
                 window.sounds.stopCharge();
+                window.sounds.stopMusic();
             }
         } else {
             this.ui.pauseScreen.classList.add('hidden');
             this.lastTime = performance.now(); // reset timer to prevent frame skips
+            if (window.sounds) {
+                window.sounds.playMusic(this.selectedSeason);
+            }
         }
     }
 
@@ -1671,6 +1677,10 @@ class Game {
         this.isPlaying = false;
         this.shakeTime = 0;
         this.shakeIntensity = 0;
+        
+        if (window.sounds) {
+            window.sounds.stopMusic();
+        }
         
         // Clear all active gameplay entities so the main menu background is clean
         this.player = null;
